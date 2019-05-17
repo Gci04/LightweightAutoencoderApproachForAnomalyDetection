@@ -1,4 +1,3 @@
-#!curl -o data.gz -L "http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data.gz"
 import os
 import pandas as pd
 import numpy as np
