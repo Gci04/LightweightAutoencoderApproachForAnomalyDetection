@@ -64,7 +64,7 @@ def fit_model(params,X):
 
     autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
     #create TensorBoard
-    tb = TensorBoard(log_dir=f'./logs/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
+    tb = TensorBoard(log_dir=f'./Logs/logs/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
 
     autoencoder.fit(X, X,epochs=20,validation_split=0.2,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
 
