@@ -61,8 +61,8 @@ def fit_model(params,X):
     decoded = Dense(input_dim,activation=None)(layer_7)
 
     autoencoder = Model(inputs=input_ , outputs=decoded)
-    opt = keras.optimizers.Adam(lr=0.005, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.0, amsgrad=False)
-    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=opt)
+
+    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
     #create TensorBoard
     tb = TensorBoard(log_dir=f'./logs/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
 
@@ -74,7 +74,7 @@ def fit_model(params,X):
 #     print(param)
 #     fit_model(param,train_normal)
 
-model = fit_model(["tanh","Adam"],train_normal)
+# model = fit_model(["tanh","Adam"],train_normal)
 # with open('model_tanh_Adam.pickle', 'wb') as f:
 #             pickle.dump(model, f)
 with open('model_tanh_Adam.pickle', 'rb') as fid:
