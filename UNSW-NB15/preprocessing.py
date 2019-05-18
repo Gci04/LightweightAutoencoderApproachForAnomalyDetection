@@ -58,6 +58,11 @@ test = scaler.transform(test)
 train_normal = train[np.where(train_labels == 0)]
 train_anomal = train[np.where(train_labels == 1)]
 
+normal_validation = train_normal[50540:]
+validation = np.concatenate((normal_validation, train_anomal))
+validation_labels = np.concatenate((np.zeros(normal_validation.shape[0]), np.ones(train_anomal.shape[0])))
+train_normal = train_normal[:50540]
+
 #AUTOENCODER
 def fit_model(X):
     input_dim = train_normal.shape[1]
@@ -83,35 +88,43 @@ def fit_model(X):
     #create TensorBoard
     tb = TensorBoard(log_dir=f'./logs1',histogram_freq=0,write_graph=False,write_images=False)
 
-    autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
+    autoencoder.fit(X, X,epochs=100,validation_split=0.1,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
 
     return autoencoder
 
+"""
 model = fit_model(train_normal)
 with open('autoenc.pickle', 'wb') as f:
             pickle.dump(model, f)
+"""  
+with open('autoenc.pickle', 'rb') as fid:
+    model = pickle.load(fid)
+          
+
+
+#GET THRESHOLD ON VALIDATION SET
+losses = Utils.get_losses(model, train_normal)
+validation_losses = Utils.get_losses(model, validation)
+test_losses = Utils.get_losses(model, test)
+max_loss = max(losses)
+avg_loss = np.mean(losses)
+thresholds = [max_loss, avg_loss, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.5, 1]
+for thresh in thresholds:
+    val_pred = (validation_losses>thresh)*1
+    print("thresh = ", thresh)
+    Utils.performance(validation_labels,val_pred)
     
-#with open('autoenc.pickle', 'rb') as fid:
-#    model = pickle.load(fid)
-            
-#losses = Utils.get_losses(model, train_normal)
+#TEST SET PERFORMANCE
+test_pred = (test_losses>0.09)*1
+Utils.performance(test_labels, test_pred)
 
+#CONF INTERVAL
+thresholds = Utils.confidence_intervals(losses,0.99)
 
+threshold = thresholds[1]
 
-"""
-nTrain = train.shape[0]
-nTest = test.shape[0]
-
-combined = pd.concat((train,test),axis=0)
-combined = combined.drop(['attack_cat'], axis = 1)
-combined = pd.get_dummies(combined)
-
-"""
-
-
-
-
-
+test_pred = (test_losses>threshold)*1
+Utils.performance(test_labels, test_pred)
 
 
 
