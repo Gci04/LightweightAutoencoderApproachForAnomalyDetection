@@ -28,6 +28,11 @@ train ,test = get_data()
 
 train_normal = (train[train["label"]==1]).drop(["label","weight"],axis=1)
 
+train_label = train.label
+train = train.drop(["label","weight"],axis=1)
+Scaler1 = StandardScaler()
+train = Scaler1.fit_transform(train.values)[np.where(train_label == 1)]
+
 Scaler = StandardScaler()
 
 train_normal = Scaler.fit_transform(train_normal)
@@ -64,7 +69,7 @@ def fit_model(params,X):
 
     autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
     #create TensorBoard
-    tb = TensorBoard(log_dir=f'./Logs/logs/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
+    tb = TensorBoard(log_dir=f'./Logs/logs22/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
 
     autoencoder.fit(X, X,epochs=20,validation_split=0.2,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
 
@@ -73,21 +78,23 @@ def fit_model(params,X):
 # for param in comb:
 #     print(param)
 #     fit_model(param,train_normal)
-
 # model = fit_model(["tanh","Adam"],train_normal)
+model = fit_model(["tanh","Adam"],train)
 # with open('model_tanh_Adam.pickle', 'wb') as f:
 #             pickle.dump(model, f)
-with open('model_tanh_Adam.pickle', 'rb') as fid:
-    model = pickle.load(fid)
-losses = Utils.get_losses(model, train_normal)
+# with open('model_tanh_Adam.pickle', 'rb') as fid:
+#     model = pickle.load(fid)
+# losses = Utils.get_losses(model, train_normal)
+losses = Utils.get_losses(model, train)
 loss_df = pd.DataFrame(losses,columns=["loss"])
 
-thresholds = Utils.confidence_intervals(losses,0.99)
+thresholds = Utils.confidence_intervals(losses,0.97)
 
 #choose the upper interval as threshold
 threshold = thresholds[1]
-xtest , ytest = test.drop(["label","weight"],axis=1), test.label.values
-xtest = StandardScaler().fit_transform(xtest.values)
+# xtest , ytest = test.drop(["label","weight"],axis=1), test.label.values
+xtest , ytest = Scaler1.transform(test.drop(["label","weight"],axis=1)), test.label.values
+# xtest = StandardScaler().fit_transform(xtest.values)
 pred = Utils.predictAnomaly(model,xtest,threshold)
 
 Utils.performance(ytest,pred)
