@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Fri May 17 13:42:19 2019
-
-@author: Rufina
-"""
-
 import pandas as pd
 import numpy as np
 import pickle
@@ -15,6 +9,8 @@ from keras.callbacks import TensorBoard
 import tensorflow as tf
 from keras import regularizers, backend as K
 import Utils
+from sklearn.manifold import TSNE
+from matplotlib import pyplot as plt
 
 #label 0 - normal, 1 - anomal
 
@@ -58,15 +54,16 @@ test = scaler.transform(test)
 train_normal = train[np.where(train_labels == 0)]
 train_anomal = train[np.where(train_labels == 1)]
 
+"""
 normal_validation = train_normal[50540:]
 validation = np.concatenate((normal_validation, train_anomal))
 validation_labels = np.concatenate((np.zeros(normal_validation.shape[0]), np.ones(train_anomal.shape[0])))
 train_normal = train_normal[:50540]
-
+"""
 #AUTOENCODER
 def fit_model(X):
     input_dim = train_normal.shape[1]
-    latent_space_size = 16
+    latent_space_size = 15
     K.clear_session()
     input_ = Input(shape = (input_dim, ))
 
@@ -83,49 +80,60 @@ def fit_model(X):
     decoded = Dense(input_dim,activation=None)(layer_7)
 
     autoencoder = Model(inputs=input_ , outputs=decoded)
+    dim_reducer = Model(inputs = input_, outputs = encoding)
 
     autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer='adam')
     #create TensorBoard
-    tb = TensorBoard(log_dir=f'./logs1',histogram_freq=0,write_graph=False,write_images=False)
+    tb = TensorBoard(log_dir=f'./logs5',histogram_freq=0,write_graph=False,write_images=False)
 
-    autoencoder.fit(X, X,epochs=100,validation_split=0.1,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
+    autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
 
-    return autoencoder
+    return autoencoder, dim_reducer
 
 """
-model = fit_model(train_normal)
-with open('autoenc.pickle', 'wb') as f:
-            pickle.dump(model, f)
-"""  
-with open('autoenc.pickle', 'rb') as fid:
-    model = pickle.load(fid)
-          
+autoencoder, dim_reducer = fit_model(train_normal)
+with open('autoenc100.pickle', 'wb') as f:
+            pickle.dump(autoencoder, f)
+with open('dimred100.pickle', 'wb') as f:
+            pickle.dump(dim_reducer, f)            
 
-
-#GET THRESHOLD ON VALIDATION SET
-losses = Utils.get_losses(model, train_normal)
-validation_losses = Utils.get_losses(model, validation)
-test_losses = Utils.get_losses(model, test)
-max_loss = max(losses)
-avg_loss = np.mean(losses)
-thresholds = [max_loss, avg_loss, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.5, 1]
-for thresh in thresholds:
-    val_pred = (validation_losses>thresh)*1
-    print("thresh = ", thresh)
-    Utils.performance(validation_labels,val_pred)
+"""
+with open('autoenc100.pickle', 'rb') as fid:
+    autoencoder = pickle.load(fid)
     
+with open('dimred100.pickle', 'rb') as fid:
+    dim_reducer = pickle.load(fid)
+
+
 #TEST SET PERFORMANCE
-test_pred = (test_losses>0.09)*1
-Utils.performance(test_labels, test_pred)
-
+losses = Utils.get_losses(autoencoder, train_normal)
+test_losses = Utils.get_losses(autoencoder, test)
 #CONF INTERVAL
-thresholds = Utils.confidence_intervals(losses,0.99)
-
+thresholds = Utils.confidence_intervals(losses,0.95)
 threshold = thresholds[1]
 
 test_pred = (test_losses>threshold)*1
 Utils.performance(test_labels, test_pred)
 
+#tSNE
 
+train_reduced = dim_reducer.predict(train)
+train_embedded = TSNE(n_components=2).fit_transform(train_reduced)
 
+with open('train_tsne.pickle', 'wb') as f:
+            pickle.dump(train_embedded, f)
+
+plt.scatter(train_embedded[:,0], train_embedded[:,1], c = train_labels)
+plt.show()
+"""
+
+test_reduced = dim_reducer.predict(test)
+test_embedded = TSNE(n_components=2).fit_transform(test_reduced)
+
+with open('test_tsne.pickle', 'wb') as f:
+            pickle.dump(test_embedded, f)
+            
+plt.scatter(test_embedded[:,0], test_embedded[:,1], c = test_labels)
+plt.show()
+"""
 
