@@ -1,0 +1,717 @@
+
+np.random.seed(43)
+
+---------------------------------code-------------------------------
+
+def fit_model(params,X,latent=12,BS=100,ep = 20):
+
+  input_dim = train_normal.shape[1]
+  latent_space_size = latent
+  K.clear_session()
+  input_ = Input(shape = (input_dim, ))
+
+  layer_1 = Dense(100, activation=params[0])(input_)
+  layer_2 = Dense(50, activation=params[0])(layer_1)
+  layer_3 = Dense(25, activation=params[0])(layer_2)
+
+  encoding = Dense(latent_space_size,activation=None)(layer_3)
+
+  layer_6 = Dense(25, activation=params[0])(encoding)
+  layer_7 = Dense(50, activation=params[0])(layer_6)
+  layer_8 = Dense(100, activation=params[0])(layer_7)
+
+  decoded = Dense(input_dim,activation=None)(layer_8)
+
+  autoencoder = Model(inputs=input_ , outputs=decoded)
+
+  autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
+
+  autoencoder.fit(X, X,epochs=ep,validation_split=0.2,batch_size=BS,shuffle=True,verbose=0)
+
+  return autoencoder
+
+for bs in np.arange(20,500,10) :
+  print("Batch Size : ",bs)
+  for l in np.arange(10,25,1):
+    print("Latent Space :",l)
+    model = fit_model(["tanh","Adam"],X=train,latent=l,BS=bs)
+    losses = Utils.get_losses(model, train)
+    thresholds = Utils.confidence_intervals(losses,0.95)
+    threshold = thresholds[1]
+    pred = Utils.predictAnomaly(model,xtest,threshold)
+    acc = accuracy_score(pred,ytest)
+    print("Accurary : ",acc)
+    f1 = f1_score(pred,ytest)
+    print("F1 Score : ",f1)
+
+--------------------------------code--------------------------------
+
+Batch Size :  20
+Latent Space : 10
+Accurary :  0.8378726046841731
+F1 Score :  0.8302920555323398
+Latent Space : 11
+Accurary :  0.8271823988644429
+F1 Score :  0.8214645770323526
+Latent Space : 12
+Accurary :  0.8482523066004258
+F1 Score :  0.8395930041731139
+Latent Space : 13
+Accurary :  0.8289123491838183
+F1 Score :  0.8225116193456352
+Latent Space : 14
+Accurary :  0.8147622427253371
+F1 Score :  0.8107667210440457
+Latent Space : 15
+Accurary :  0.8353442157558553
+F1 Score :  0.8283547581614723
+Latent Space : 16
+Accurary :  0.827847764371895
+F1 Score :  0.8216698065524054
+Latent Space : 17
+Accurary :  0.8329488999290277
+F1 Score :  0.8262273901808785
+Latent Space : 18
+Accurary :  0.8423527324343506
+F1 Score :  0.8344666977177456
+Latent Space : 19
+Accurary :  0.8275372604684174
+F1 Score :  0.8215039941235882
+Latent Space : 20
+Accurary :  0.8249201561391057
+F1 Score :  0.8193510000457688
+Latent Space : 21
+Accurary :  0.8411550745209369
+F1 Score :  0.8334650978933171
+Latent Space : 22
+Accurary :  0.836985450674237
+F1 Score :  0.8298689875468728
+Latent Space : 23
+Accurary :  0.8134758694109298
+F1 Score :  0.8099606815203145
+Latent Space : 24
+Accurary :  0.8266057487579844
+F1 Score :  0.8204986912797906
+Batch Size :  30
+Latent Space : 10
+Accurary :  0.8279364797728885
+F1 Score :  0.8219743907476249
+Latent Space : 11
+Accurary :  0.8181777856635912
+F1 Score :  0.813622516255172
+Latent Space : 12
+Accurary :  0.8223030518097941
+F1 Score :  0.8168601993233976
+Latent Space : 13
+Accurary :  0.8176898509581263
+F1 Score :  0.8134700916765
+Latent Space : 14
+Accurary :  0.823944286728176
+F1 Score :  0.8185268163321292
+Latent Space : 15
+Accurary :  0.8223917672107878
+F1 Score :  0.8170687134502923
+Latent Space : 16
+Accurary :  0.8219481902058198
+F1 Score :  0.8172131147540984
+Latent Space : 17
+Accurary :  0.8345457771469127
+F1 Score :  0.8280947552769841
+Latent Space : 18
+Accurary :  0.8177785663591199
+F1 Score :  0.8134423251589464
+Latent Space : 19
+Accurary :  0.8286905606813343
+F1 Score :  0.8226813590449954
+Latent Space : 20
+Accurary :  0.8255855216465579
+F1 Score :  0.8199963376670939
+Latent Space : 21
+Accurary :  0.8126330731014905
+F1 Score :  0.8092140921409214
+Latent Space : 22
+Accurary :  0.8108587650816181
+F1 Score :  0.8081871345029239
+Latent Space : 23
+Accurary :  0.8310858765081618
+F1 Score :  0.8243542435424355
+Latent Space : 24
+Accurary :  0.8206174591909156
+F1 Score :  0.8158805317792752
+Batch Size :  40
+Latent Space : 10
+Accurary :  0.8222586941092974
+F1 Score :  0.8172739294997493
+Latent Space : 11
+Accurary :  0.8194198012775018
+F1 Score :  0.8148788140602973
+Latent Space : 12
+Accurary :  0.8388484740951029
+F1 Score :  0.8311567597713436
+Latent Space : 13
+Accurary :  0.8206618168914124
+F1 Score :  0.8156154512701236
+Latent Space : 14
+Accurary :  0.821415897799858
+F1 Score :  0.8163656267104543
+Latent Space : 15
+Accurary :  0.8203069552874379
+F1 Score :  0.8156205907787539
+Latent Space : 16
+Accurary :  0.8238999290276792
+F1 Score :  0.8187380147931697
+Latent Space : 17
+Accurary :  0.825541163946061
+F1 Score :  0.8198598451884761
+Latent Space : 18
+Accurary :  0.819153655074521
+F1 Score :  0.814774430966335
+Latent Space : 19
+Accurary :  0.8156050390347764
+F1 Score :  0.8115166628882339
+Latent Space : 20
+Accurary :  0.8146735273243435
+F1 Score :  0.8110357304387156
+Latent Space : 21
+Accurary :  0.8169801277501775
+F1 Score :  0.8126078662912163
+Latent Space : 22
+Accurary :  0.81888750887154
+F1 Score :  0.8145523913339692
+Latent Space : 23
+Accurary :  0.843860894251242
+F1 Score :  0.8360503027480205
+Latent Space : 24
+Accurary :  0.8205287437899219
+F1 Score :  0.8155879671832271
+Batch Size :  50
+Latent Space : 10
+Accurary :  0.834235273243435
+F1 Score :  0.8271907514450867
+Latent Space : 11
+Accurary :  0.8249201561391057
+F1 Score :  0.8193675346666057
+Latent Space : 12
+Accurary :  0.8126774308019872
+F1 Score :  0.8094056054520016
+Latent Space : 13
+Accurary :  0.8128992193044713
+F1 Score :  0.8093990058743786
+Latent Space : 14
+Accurary :  0.825541163946061
+F1 Score :  0.8200082376092628
+Latent Space : 15
+Accurary :  0.8201295244854506
+F1 Score :  0.8153713062878478
+Latent Space : 16
+Accurary :  0.8522888573456352
+F1 Score :  0.8429689710459305
+Latent Space : 17
+Accurary :  0.8227909865152591
+F1 Score :  0.817621547591874
+Latent Space : 18
+Accurary :  0.8462118523775728
+F1 Score :  0.8378011695906433
+Latent Space : 19
+Accurary :  0.8125
+F1 Score :  0.8089836865651407
+Latent Space : 20
+Accurary :  0.8368080198722498
+F1 Score :  0.8295733543336267
+Latent Space : 21
+Accurary :  0.8233232789212207
+F1 Score :  0.818302084758907
+Latent Space : 22
+Accurary :  0.82097232079489
+F1 Score :  0.8162112932604736
+Latent Space : 23
+Accurary :  0.8286462029808375
+F1 Score :  0.8225784228172508
+Latent Space : 24
+Accurary :  0.8197746628814763
+F1 Score :  0.8150407429325807
+Batch Size :  60
+Latent Space : 10
+Accurary :  0.8091288147622427
+F1 Score :  0.8062846081123666
+Latent Space : 11
+Accurary :  0.8284244144783535
+F1 Score :  0.8222589835493062
+Latent Space : 12
+Accurary :  0.8128992193044713
+F1 Score :  0.809742895805142
+Latent Space : 13
+Accurary :  0.8282469836763662
+F1 Score :  0.8224993123682038
+Latent Space : 14
+Accurary :  0.8215933286018453
+F1 Score :  0.8169155134741443
+Latent Space : 15
+Accurary :  0.8208392476933996
+F1 Score :  0.8160830563271254
+Latent Space : 16
+Accurary :  0.8187987934705465
+F1 Score :  0.8145962873871012
+Latent Space : 17
+Accurary :  0.8294002838892832
+F1 Score :  0.8233997612269263
+Latent Space : 18
+Accurary :  0.8184882895670689
+F1 Score :  0.8141182883619513
+Latent Space : 19
+Accurary :  0.8151614620298083
+F1 Score :  0.8116439904172129
+Latent Space : 20
+Accurary :  0.8478087295954577
+F1 Score :  0.8390788424557948
+Latent Space : 21
+Accurary :  0.8339691270404542
+F1 Score :  0.82739220659442
+Latent Space : 22
+Accurary :  0.8207948899929027
+F1 Score :  0.815978864899335
+Latent Space : 23
+Accurary :  0.8098828956706884
+F1 Score :  0.807058611686324
+Latent Space : 24
+Accurary :  0.8396025550035486
+F1 Score :  0.8320950965824665
+Batch Size :  70
+Latent Space : 10
+Accurary :  0.8449254790631654
+F1 Score :  0.8368946533544835
+Latent Space : 11
+Accurary :  0.8159155429382541
+F1 Score :  0.8118425825172289
+Latent Space : 12
+Accurary :  0.8327714691270405
+F1 Score :  0.8260588723816555
+Latent Space : 13
+Accurary :  0.8320173882185947
+F1 Score :  0.8251858006739602
+Latent Space : 14
+Accurary :  0.8197746628814763
+F1 Score :  0.8153097868084913
+Latent Space : 15
+Accurary :  0.8351224272533712
+F1 Score :  0.8281632841754889
+Latent Space : 16
+Accurary :  0.8252750177430802
+F1 Score :  0.8198655508300178
+Latent Space : 17
+Accurary :  0.8381387508871541
+F1 Score :  0.8304761904761905
+Latent Space : 18
+Accurary :  0.8255855216465579
+F1 Score :  0.8200622368661906
+Latent Space : 19
+Accurary :  0.8165809084457062
+F1 Score :  0.8130904488541337
+Latent Space : 20
+Accurary :  0.8253637331440739
+F1 Score :  0.8199734784398005
+Latent Space : 21
+Accurary :  0.8183108587650816
+F1 Score :  0.8141392140847626
+Latent Space : 22
+Accurary :  0.8258516678495387
+F1 Score :  0.8202380952380952
+Latent Space : 23
+Accurary :  0.8173349893541518
+F1 Score :  0.8130051766415404
+Latent Space : 24
+Accurary :  0.8277146912704045
+F1 Score :  0.8218838851692195
+Batch Size :  80
+Latent Space : 10
+Accurary :  0.8336586231369766
+F1 Score :  0.8269177513154252
+Latent Space : 11
+Accurary :  0.8276259758694109
+F1 Score :  0.8219554659580318
+Latent Space : 12
+Accurary :  0.8132984386089425
+F1 Score :  0.8099516864586624
+Latent Space : 13
+Accurary :  0.810459545777147
+F1 Score :  0.8074618122831524
+Latent Space : 14
+Accurary :  0.8234563520227112
+F1 Score :  0.818131968561506
+Latent Space : 15
+Accurary :  0.814806600425834
+F1 Score :  0.8112141080714448
+Latent Space : 16
+Accurary :  0.8119233498935415
+F1 Score :  0.8088195509063034
+Latent Space : 17
+Accurary :  0.8176898509581263
+F1 Score :  0.8133175872093024
+Latent Space : 18
+Accurary :  0.8317512420156139
+F1 Score :  0.8253281142067695
+Latent Space : 19
+Accurary :  0.8263396025550035
+F1 Score :  0.8213063124743256
+Latent Space : 20
+Accurary :  0.8037171753016323
+F1 Score :  0.8020399946315931
+Latent Space : 21
+Accurary :  0.8223917672107878
+F1 Score :  0.8177348871085214
+Latent Space : 22
+Accurary :  0.8254968062455642
+F1 Score :  0.8202175303902751
+Latent Space : 23
+Accurary :  0.8206618168914124
+F1 Score :  0.8156154512701236
+Latent Space : 24
+Accurary :  0.8156050390347764
+F1 Score :  0.8116533007113407
+Batch Size :  90
+Latent Space : 10
+Accurary :  0.819597232079489
+F1 Score :  0.8151111515206619
+Latent Space : 11
+Accurary :  0.8263396025550035
+F1 Score :  0.820733550070974
+Latent Space : 12
+Accurary :  0.83791696238467
+F1 Score :  0.8305352008162508
+Latent Space : 13
+Accurary :  0.8245652945351313
+F1 Score :  0.8193816504544001
+Latent Space : 14
+Accurary :  0.8069552874378992
+F1 Score :  0.8047204523018935
+Latent Space : 15
+Accurary :  0.8079755145493258
+F1 Score :  0.8055867427134324
+Latent Space : 16
+Accurary :  0.8210166784953868
+F1 Score :  0.8162819286982653
+Latent Space : 17
+Accurary :  0.8120120652945352
+F1 Score :  0.8085644593007498
+Latent Space : 18
+Accurary :  0.8171132008516678
+F1 Score :  0.8130921619293712
+Latent Space : 19
+Accurary :  0.830376153300213
+F1 Score :  0.8242000735564546
+Latent Space : 20
+Accurary :  0.8080642299503193
+F1 Score :  0.8057637922520985
+Latent Space : 21
+Accurary :  0.8162260468417317
+F1 Score :  0.8123046255606396
+Latent Space : 22
+Accurary :  0.8148953158268275
+F1 Score :  0.8113898305084747
+Latent Space : 23
+Accurary :  0.8261178140525195
+F1 Score :  0.8205785426583669
+Latent Space : 24
+Accurary :  0.8142299503193754
+F1 Score :  0.8102573396158028
+Batch Size :  100
+Latent Space : 10
+Accurary :  0.8209279630943932
+F1 Score :  0.8164582859740851
+Latent Space : 11
+Accurary :  0.8069552874378992
+F1 Score :  0.8046503276775294
+Latent Space : 12
+Accurary :  0.8037615330021292
+F1 Score :  0.8017743525405503
+Latent Space : 13
+Accurary :  0.8073545067423705
+F1 Score :  0.8055866421952639
+Latent Space : 14
+Accurary :  0.8133427963094393
+F1 Score :  0.8098680643412253
+Latent Space : 15
+Accurary :  0.8069996451383961
+F1 Score :  0.8038941722630369
+Latent Space : 16
+Accurary :  0.8078867991483322
+F1 Score :  0.8055493198042473
+Latent Space : 17
+Accurary :  0.8183995741660752
+F1 Score :  0.814061222636025
+Latent Space : 18
+Accurary :  0.808152945351313
+F1 Score :  0.8055043396141566
+Latent Space : 19
+Accurary :  0.8129435770049681
+F1 Score :  0.8099166103222898
+Latent Space : 20
+Accurary :  0.8047374024130589
+F1 Score :  0.802689376961004
+Latent Space : 21
+Accurary :  0.8046930447125621
+F1 Score :  0.802988948051367
+Latent Space : 22
+Accurary :  0.8086408800567778
+F1 Score :  0.8059029964905966
+Latent Space : 23
+Accurary :  0.8023420865862314
+F1 Score :  0.8011779403890773
+Latent Space : 24
+Accurary :  0.8218151171043293
+F1 Score :  0.8170015033483667
+Batch Size :  110
+Latent Space : 10
+Accurary :  0.8192423704755145
+F1 Score :  0.8145113569120124
+Latent Space : 11
+Accurary :  0.8328158268275373
+F1 Score :  0.8266409088818362
+Latent Space : 12
+Accurary :  0.8016767210787793
+F1 Score :  0.8004641406703262
+Latent Space : 13
+Accurary :  0.8275372604684174
+F1 Score :  0.8219454112474812
+Latent Space : 14
+Accurary :  0.8102821149751597
+F1 Score :  0.8072468340168553
+Latent Space : 15
+Accurary :  0.8116572036905607
+F1 Score :  0.8083762072389205
+Latent Space : 16
+Accurary :  0.8368080198722498
+F1 Score :  0.8299042951592769
+Latent Space : 17
+Accurary :  0.8159599006387509
+F1 Score :  0.8122199592668025
+Latent Space : 18
+Accurary :  0.7899219304471257
+F1 Score :  0.7914023960535588
+Latent Space : 19
+Accurary :  0.8092618878637331
+F1 Score :  0.806776309876876
+Latent Space : 20
+Accurary :  0.8213715400993612
+F1 Score :  0.8165459432372101
+Latent Space : 21
+Accurary :  0.8028300212916962
+F1 Score :  0.8013762902721301
+Latent Space : 22
+Accurary :  0.8237668559261888
+F1 Score :  0.8182275701148374
+Latent Space : 23
+Accurary :  0.8024308019872249
+F1 Score :  0.8010541361443632
+Latent Space : 24
+Accurary :  0.8224804826117814
+F1 Score :  0.8173103259380992
+Batch Size :  120
+Latent Space : 10
+Accurary :  0.8223917672107878
+F1 Score :  0.8171522513471549
+Latent Space : 11
+Accurary :  0.8143630234208659
+F1 Score :  0.810779038748474
+Latent Space : 12
+Accurary :  0.8125
+F1 Score :  0.8091044573905974
+Latent Space : 13
+Accurary :  0.8241217175301633
+F1 Score :  0.818842235116736
+Latent Space : 14
+Accurary :  0.8041607523066004
+F1 Score :  0.8024343312301426
+Latent Space : 15
+Accurary :  0.808152945351313
+F1 Score :  0.8058361391694725
+Latent Space : 16
+Accurary :  0.807931156848829
+F1 Score :  0.805533099793407
+Latent Space : 17
+Accurary :  0.8164921930447125
+F1 Score :  0.8126782884310619
+Latent Space : 18
+Accurary :  0.805180979418027
+F1 Score :  0.8034195685256468
+Latent Space : 19
+Accurary :  0.8115684882895671
+F1 Score :  0.8084242806890953
+Latent Space : 20
+Accurary :  0.8080642299503193
+F1 Score :  0.8057114633379732
+Latent Space : 21
+Accurary :  0.823944286728176
+F1 Score :  0.818874640624287
+Latent Space : 22
+Accurary :  0.805846344925479
+F1 Score :  0.8035722299510837
+Latent Space : 23
+Accurary :  0.8132097232079489
+F1 Score :  0.809569031791254
+Latent Space : 24
+Accurary :  0.8159155429382541
+F1 Score :  0.8123191027496383
+Batch Size :  130
+Latent Space : 10
+Accurary :  0.8077980837473385
+F1 Score :  0.8053371669886339
+Latent Space : 11
+Accurary :  0.8052696948190206
+F1 Score :  0.8033330346743123
+Latent Space : 12
+Accurary :  0.8022977288857346
+F1 Score :  0.8009290276475054
+Latent Space : 13
+Accurary :  0.8235894251242015
+F1 Score :  0.8184101182594402
+Latent Space : 14
+Accurary :  0.822125621007807
+F1 Score :  0.8174451424929436
+Latent Space : 15
+Accurary :  0.8214602555003548
+F1 Score :  0.8166871612697545
+Latent Space : 16
+Accurary :  0.8266501064584811
+F1 Score :  0.8210130988366768
+Latent Space : 17
+Accurary :  0.8066004258339248
+F1 Score :  0.804414139601651
+Latent Space : 18
+Accurary :  0.8163147622427254
+F1 Score :  0.8128023145427421
+Latent Space : 19
+Accurary :  0.8312189496096523
+F1 Score :  0.8246139663516939
+Latent Space : 20
+Accurary :  0.8146291696238467
+F1 Score :  0.8110161443494777
+Latent Space : 21
+Accurary :  0.8202625975869411
+F1 Score :  0.8153986332574031
+Latent Space : 22
+Accurary :  0.8089070262597587
+F1 Score :  0.806138061380614
+Latent Space : 23
+Accurary :  0.8134758694109298
+F1 Score :  0.8100121989789003
+Latent Space : 24
+Accurary :  0.8146735273243435
+F1 Score :  0.8113088248577364
+Batch Size :  140
+Latent Space : 10
+
+
+----------------------------code--------------------
+def fit_model(params,X,latent=12,BS=100,ep = 20):
+
+  input_dim = train_normal.shape[1]
+  latent_space_size = latent
+  K.clear_session()
+  input_ = Input(shape = (input_dim, ))
+
+  layer_1 = Dense(100, activation=params[0])(input_)
+  layer_2 = Dense(50, activation=params[0])(layer_1)
+  layer_3 = Dense(25, activation=params[0])(layer_2)
+
+  encoding = Dense(latent_space_size,activation=None)(layer_3)
+
+  layer_6 = Dense(25, activation=params[0])(encoding)
+  layer_7 = Dense(50, activation=params[0])(layer_6)
+  layer_8 = Dense(100, activation=params[0])(layer_7)
+
+  decoded = Dense(input_dim,activation=None)(layer_8)
+
+  autoencoder = Model(inputs=input_ , outputs=decoded)
+
+  autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
+
+  autoencoder.fit(X, X,epochs=ep,validation_split=0.2,batch_size=BS,shuffle=True,verbose=0)
+
+  return autoencoder
+
+for bs in [20,30,10] :
+  print("Batch Size : ",bs)
+  for l in [10,12,15]:
+    print("Latent Space :",l)
+    for epoc in [30,40,50]:
+      model = fit_model(["tanh","Adam"],X=train,latent=l,BS=bs,ep=epoc)
+      losses = Utils.get_losses(model, train)
+      thresholds = Utils.confidence_intervals(losses,0.95)
+      threshold = thresholds[1]
+      pred = Utils.predictAnomaly(model,xtest,threshold)
+      acc = accuracy_score(pred,ytest)
+      f1 = f1_score(pred,ytest)
+      print("Latent Space : {},Epochs : {}, Accuracy: {}, F1 : {}".format(l,epoc,round(acc,3),round(f1,3)))
+      print("-"*50)
+
+----------------------------------code--------------------------
+
+Batch Size :  20
+Latent Space : 10
+Latent Space : 10,Epochs : 30, Accuracy: 0.847, F1 : 0.839
+--------------------------------------------------
+Latent Space : 10,Epochs : 40, Accuracy: 0.816, F1 : 0.812
+--------------------------------------------------
+Latent Space : 10,Epochs : 50, Accuracy: 0.839, F1 : 0.831
+--------------------------------------------------
+Latent Space : 12
+Latent Space : 12,Epochs : 30, Accuracy: 0.824, F1 : 0.819
+--------------------------------------------------
+Latent Space : 12,Epochs : 40, Accuracy: 0.837, F1 : 0.83
+--------------------------------------------------
+Latent Space : 12,Epochs : 50, Accuracy: 0.846, F1 : 0.837
+--------------------------------------------------
+Latent Space : 15
+Latent Space : 15,Epochs : 30, Accuracy: 0.848, F1 : 0.84
+--------------------------------------------------
+Latent Space : 15,Epochs : 40, Accuracy: 0.839, F1 : 0.831
+--------------------------------------------------
+Latent Space : 15,Epochs : 50, Accuracy: 0.847, F1 : 0.838
+--------------------------------------------------
+Batch Size :  30
+Latent Space : 10
+Latent Space : 10,Epochs : 30, Accuracy: 0.854, F1 : 0.845
+--------------------------------------------------
+Latent Space : 10,Epochs : 40, Accuracy: 0.834, F1 : 0.827
+--------------------------------------------------
+Latent Space : 10,Epochs : 50, Accuracy: 0.846, F1 : 0.837
+--------------------------------------------------
+Latent Space : 12
+Latent Space : 12,Epochs : 30, Accuracy: 0.826, F1 : 0.821
+--------------------------------------------------
+Latent Space : 12,Epochs : 40, Accuracy: 0.852, F1 : 0.843
+--------------------------------------------------
+Latent Space : 12,Epochs : 50, Accuracy: 0.85, F1 : 0.841
+--------------------------------------------------
+Latent Space : 15
+Latent Space : 15,Epochs : 30, Accuracy: 0.824, F1 : 0.818
+--------------------------------------------------
+Latent Space : 15,Epochs : 40, Accuracy: 0.852, F1 : 0.843
+--------------------------------------------------
+Latent Space : 15,Epochs : 50, Accuracy: 0.843, F1 : 0.835
+--------------------------------------------------
+Batch Size :  10
+Latent Space : 10
+Latent Space : 10,Epochs : 30, Accuracy: 0.823, F1 : 0.817
+--------------------------------------------------
+Latent Space : 10,Epochs : 40, Accuracy: 0.828, F1 : 0.822
+--------------------------------------------------
+Latent Space : 10,Epochs : 50, Accuracy: 0.828, F1 : 0.822
+--------------------------------------------------
+Latent Space : 12
+Latent Space : 12,Epochs : 30, Accuracy: 0.846, F1 : 0.837
+--------------------------------------------------
+Latent Space : 12,Epochs : 40, Accuracy: 0.824, F1 : 0.819
+--------------------------------------------------
+Latent Space : 12,Epochs : 50, Accuracy: 0.841, F1 : 0.833
+--------------------------------------------------
+Latent Space : 15
+Latent Space : 15,Epochs : 30, Accuracy: 0.826, F1 : 0.82
+--------------------------------------------------
+Latent Space : 15,Epochs : 40, Accuracy: 0.837, F1 : 0.83
+--------------------------------------------------
+Latent Space : 15,Epochs : 50, Accuracy: 0.819, F1 : 0.814
+--------------------------------------------------
+
+------------------------------------------code------------
