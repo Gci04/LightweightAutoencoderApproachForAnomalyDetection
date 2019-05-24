@@ -1,5 +1,7 @@
 import numpy as np
 np.random.seed(43)
+from tensorflow import set_random_seed
+set_random_seed(1)
 import pandas as pd
 import os
 from scipy import stats
@@ -15,74 +17,108 @@ import keras
 from matplotlib import pyplot as plt
 %matplotlib inline
 import pickle
+from sklearn.metrics import accuracy_score,f1_score
 
 import seaborn as sn
 
 import warnings
 warnings.filterwarnings('ignore')
 
-from preprocessing import get_data
+from preprocessing import get_data ,get_kdd_data
 import Utils
 
 import warnings
 warnings.filterwarnings('ignore')
 
-train ,test = get_data()
-
-train_normal = (train[train["label"]==1]).drop(["label","weight"],axis=1)
+#for NLS-KDD
+train ,test ,indexes = get_data("multiclass")
 
 train_label = train.label
 train = train.drop(["label","weight"],axis=1)
-Scaler1 = StandardScaler()
-train = Scaler1.fit_transform(train.values)[np.where(train_label == 1)]
 
-#tune activation function and optimizer
-def fit_model(params,X):
-    input_dim = train_normal.shape[1]
-    latent_space_size = 15
-    K.clear_session()
-    input_ = Input(shape = (input_dim, ))
+Scaler = StandardScaler()
+train = Scaler.fit_transform(train.values)[np.where(train_label == 1)]
 
-    layer_1 = Dense(115, activation=params[0])(input_)
-    layer_2 = Dense(100, activation=params[0])(layer_1)
-    layer_3 = Dense(75, activation=params[0])(layer_2)
-    layer_4 = Dense(50, activation='relu')(layer_3)
-    layer_5 = Dense(25, activation=params[0])(layer_4)
+xtest , ytest = Scaler.transform(test.drop(["label","weight"],axis=1)), test.label.values
 
-    encoding = Dense(latent_space_size,activation=None)(layer_5)
+def fit_model(params,X,latent=10,BS=250,ep = 95):
 
-    layer_6 = Dense(25, activation=params[0])(encoding)
-    layer_7 = Dense(50, activation='relu')(layer_6)
-    layer_8 = Dense(75, activation=params[0])(layer_7)
-    layer_9 = Dense(100, activation=params[0])(layer_8)
-    layer_10 = Dense(115, activation=params[0])(layer_9)
+  input_dim = X.shape[1]
+  latent_space_size = latent
+  K.clear_session()
+  input_ = Input(shape = (input_dim, ))
 
-    decoded = Dense(input_dim,activation=None)(layer_10)
+  layer_1 = Dense(100, activation=params[0])(input_)
+  layer_2 = Dense(50, activation=params[0],kernel_regularizer=regularizers.l2(0.01))(layer_1)
+  layer_3 = Dense(25, activation=params[0])(layer_2)
 
-    autoencoder = Model(inputs=input_ , outputs=decoded)
+  encoding = Dense(latent_space_size,activation=None)(layer_3)
 
-    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=params[1])
-    #create TensorBoard
-    tb = TensorBoard(log_dir=f'./Logs/logs30/{params[0]}_{params[1]}',histogram_freq=0,write_graph=False,write_images=False)
+  layer_6 = Dense(25, activation=params[0])(encoding)
+  layer_7 = Dense(50, activation=params[0],kernel_regularizer=regularizers.l2(0.01))(layer_6)
+  layer_8 = Dense(100, activation=params[0])(layer_7)
 
-    autoencoder.fit(X, X,epochs=50,validation_split=0.2,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
+  decoded = Dense(input_dim,activation=None)(layer_8)
 
-    return autoencoder
+  autoencoder = Model(inputs=input_ , outputs=decoded)
+  opt = optimizers.Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+  autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=opt)
 
-# for param in comb:
-#     print(param)
-#     fit_model(param,train_normal)
-# model = fit_model(["tanh","Adam"],train_normal)
-model = fit_model(["tanh","Adam"],train)
+  autoencoder.fit(X, X,epochs=ep,validation_split=0.2,batch_size=BS,shuffle=True,verbose=0)
+
+  return autoencoder
+
+# model = fit_model(["tanh","Adam"],X=train,latent=10,BS=250,ep=95)
+
+# with open('multi_class_tanh_Adam_l10_bs20_ep95.pickle', 'rb') as fid:
+#     model = pickle.load(fid)
 
 losses = Utils.get_losses(model, train)
 thresholds = Utils.confidence_intervals(losses,0.95)
-
-#choose the upper interval as threshold
 threshold = thresholds[1]
-
-xtest , ytest = Scaler1.transform(test.drop(["label","weight"],axis=1)), test.label.values
-
 pred = Utils.predictAnomaly(model,xtest,threshold)
+Utils.performance(pred,ytest)
 
-Utils.performance(ytest,pred)
+
+#For KDD-99
+train ,test ,indx = get_kdd_data("multiclass")
+train_label = train.label
+train = train.drop(["label"],axis=1)
+
+Scaler = StandardScaler()
+train = Scaler.fit_transform(train.values)[np.where(train_label == 1)]
+
+xtest , ytest = Scaler.transform(test.drop(["label"],axis=1)), test.label.values
+
+def fit_kdd_AE(X):
+    input_dim = X.shape[1]
+    latent_space_size = 10
+    K.clear_session()
+    input_ = Input(shape = (input_dim, ))
+
+    layer_1 = Dense(100, activation="tanh")(input_)
+    layer_2 = Dense(50, activation="tanh")(layer_1)
+    layer_3 = Dense(25, activation="tanh")(layer_2)
+
+    encoding = Dense(latent_space_size,activation=None)(layer_3)
+
+    layer_5 = Dense(25, activation="tanh")(encoding)
+    layer_6 = Dense(50, activation="tanh")(layer_5)
+    layer_7 = Dense(100, activation='tanh')(layer_6)
+
+    decoded = Dense(input_dim,activation=None)(layer_7)
+
+    autoencoder = Model(inputs=input_ , outputs=decoded)
+    # opt = optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer="adam")
+    # autoencoder.summary()
+
+    #create TensorBoard
+    tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
+
+    # Fit autoencoder
+    autoencoder.fit(X, X,epochs=10,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=1,callbacks=[tb])
+
+    return autoencoder
+
+model = fit_kdd_AE(train)

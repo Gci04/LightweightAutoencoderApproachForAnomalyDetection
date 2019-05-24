@@ -34,8 +34,8 @@ def predictAnomaly(model,x,threshold):
 def performance(true,pred,title="confusion matrix"):
     acc = accuracy_score(pred,true)
     print("Accurary : ",acc)
-    f1 = f1_score(true,pred)
-    print("F1 Score : ",f1)
+    f1 = f1_score(true,pred,average="weighted")
+    print("Weighted F1 Score : ",f1)
 
     print("Classification report")
     print(classification_report(pred,true))
