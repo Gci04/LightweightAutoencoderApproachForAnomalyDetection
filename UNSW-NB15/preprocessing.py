@@ -86,12 +86,12 @@ def fit_model(X):
     #create TensorBoard
     tb = TensorBoard(log_dir=f'./logs5',histogram_freq=0,write_graph=False,write_images=False)
 
-    autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
+    hist = autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
 
-    return autoencoder, dim_reducer
+    return autoencoder, dim_reducer, hist
 
 """
-autoencoder, dim_reducer = fit_model(train_normal)
+autoencoder, dim_reducer, hist = fit_model(train_normal)
 with open('autoenc100.pickle', 'wb') as f:
             pickle.dump(autoencoder, f)
 with open('dimred100.pickle', 'wb') as f:
@@ -116,7 +116,7 @@ test_pred = (test_losses>threshold)*1
 Utils.performance(test_labels, test_pred)
 
 #tSNE
-
+"""
 train_reduced = dim_reducer.predict(train)
 train_embedded = TSNE(n_components=2).fit_transform(train_reduced)
 
@@ -135,5 +135,5 @@ with open('test_tsne.pickle', 'wb') as f:
             
 plt.scatter(test_embedded[:,0], test_embedded[:,1], c = test_labels)
 plt.show()
-"""
+
 
