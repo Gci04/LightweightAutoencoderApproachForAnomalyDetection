@@ -1,1 +1,1 @@
-# A Lightweight Deep Autoencoder-based Approachfor Unsupervised Anomaly Detection
+# A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection
