@@ -13,7 +13,7 @@ from keras import optimizers, regularizers, backend as K
 import seaborn as sn
 import keras
 from matplotlib import pyplot as plt
-%matplotlib inline
+# %matplotlib inline
 import pickle
 
 import seaborn as sn

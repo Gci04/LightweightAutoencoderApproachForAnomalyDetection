@@ -13,7 +13,7 @@ from keras import optimizers, regularizers, backend as K
 import seaborn as sn
 import keras
 from matplotlib import pyplot as plt
-%matplotlib inline
+# %matplotlib inline
 import pickle
 
 import seaborn as sn
@@ -21,7 +21,7 @@ import seaborn as sn
 import warnings
 warnings.filterwarnings('ignore')
 
-from preprocessing import get_data, get_kdd_data
+from preprocessing import get_kdd_data
 import Utils
 
 # train ,test ,indx = get_kdd_data("multiclass")
@@ -66,9 +66,11 @@ def fit_kdd_AE(X):
 
     return autoencoder
 
-model = fit_kdd_AE(train)
+# model = fit_kdd_AE(train)
 # with open('kdd99_ep10_bs100_l10.pickle', 'wb') as f:
 #             pickle.dump(model, f)
+with open('kdd99_ep10_bs100_l10.pickle', 'rb') as fid:
+    model = pickle.load(fid)
 losses = Utils.get_losses(model, train)
 
 thresholds = Utils.confidence_intervals(losses,0.95)

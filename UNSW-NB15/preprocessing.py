@@ -95,12 +95,12 @@ autoencoder, dim_reducer, hist = fit_model(train_normal)
 with open('autoenc100.pickle', 'wb') as f:
             pickle.dump(autoencoder, f)
 with open('dimred100.pickle', 'wb') as f:
-            pickle.dump(dim_reducer, f)            
+            pickle.dump(dim_reducer, f)
 
 """
 with open('autoenc100.pickle', 'rb') as fid:
     autoencoder = pickle.load(fid)
-    
+
 with open('dimred100.pickle', 'rb') as fid:
     dim_reducer = pickle.load(fid)
 
@@ -130,10 +130,8 @@ plt.show()
 test_reduced = dim_reducer.predict(test)
 test_embedded = TSNE(n_components=2).fit_transform(test_reduced)
 
-with open('test_tsne.pickle', 'wb') as f:
-            pickle.dump(test_embedded, f)
-            
+# with open('test_tsne.pickle', 'wb') as f:
+#             pickle.dump(test_embedded, f)
+
 plt.scatter(test_embedded[:,0], test_embedded[:,1], c = test_labels)
 plt.show()
-
-
