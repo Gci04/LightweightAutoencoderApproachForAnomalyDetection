@@ -11,6 +11,7 @@ from keras import regularizers, backend as K
 import Utils
 from sklearn.manifold import TSNE
 from matplotlib import pyplot as plt
+import time
 
 #label 0 - normal, 1 - anomal
 
@@ -26,6 +27,7 @@ from matplotlib import pyplot as plt
 #DROP SOME FEATURES
 #to_drop = ['srcip','dstip', 'service', 'attack_cat' ]
 
+np.random.seed(3)
 
 test = pd.read_csv("dataset/part_training_testing_set/UNSW_NB15_training-set.csv")
 train = pd.read_csv("dataset/part_training_testing_set/UNSW_NB15_testing-set.csv")
@@ -86,16 +88,21 @@ def fit_model(X):
     #create TensorBoard
     tb = TensorBoard(log_dir=f'./logs5',histogram_freq=0,write_graph=False,write_images=False)
 
-    hist = autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
+    hist = autoencoder.fit(X, X,epochs=100,validation_split=0.2,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
 
     return autoencoder, dim_reducer, hist
 
-"""
+start = time.time()
 autoencoder, dim_reducer, hist = fit_model(train_normal)
+end = time.time()
+print("time", end - start)
+
+
 with open('autoenc100.pickle', 'wb') as f:
             pickle.dump(autoencoder, f)
 with open('dimred100.pickle', 'wb') as f:
             pickle.dump(dim_reducer, f)            
+
 
 """
 with open('autoenc100.pickle', 'rb') as fid:
@@ -103,7 +110,7 @@ with open('autoenc100.pickle', 'rb') as fid:
     
 with open('dimred100.pickle', 'rb') as fid:
     dim_reducer = pickle.load(fid)
-
+"""
 
 #TEST SET PERFORMANCE
 losses = Utils.get_losses(autoencoder, train_normal)
@@ -126,7 +133,7 @@ with open('train_tsne.pickle', 'wb') as f:
 plt.scatter(train_embedded[:,0], train_embedded[:,1], c = train_labels)
 plt.show()
 """
-
+"""
 test_reduced = dim_reducer.predict(test)
 test_embedded = TSNE(n_components=2).fit_transform(test_reduced)
 
@@ -135,5 +142,5 @@ with open('test_tsne.pickle', 'wb') as f:
             
 plt.scatter(test_embedded[:,0], test_embedded[:,1], c = test_labels)
 plt.show()
-
+"""
 
