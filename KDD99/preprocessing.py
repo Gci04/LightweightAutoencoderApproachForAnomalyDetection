@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, './KDD99/')
 import os
 import pandas as pd
 import numpy as np
@@ -8,15 +10,15 @@ warnings.filterwarnings('ignore')
 
 def get_kdd_data(classification = 'Binary'):
     features = None
-    with open('features.txt', 'r') as f:
+    with open('KDD99/features.txt', 'r') as f:
       features = f.read().split('\n')
 
-    train = pd.read_csv('KDD99_Data/kdd_train.gz', compression='gzip',names=features ,sep=',')
+    train = pd.read_csv('KDD99/KDD99_Data/kdd_train.gz', compression='gzip',names=features ,sep=',')
     train.drop_duplicates(inplace=True)
 
 
-    test = pd.read_csv('KDD99_Data/kdd_test.gz', compression='gzip',names=features ,sep=',')
-    # test.drop_duplicates(inplace=True)
+    test = pd.read_csv('KDD99/KDD99_Data/kdd_test.gz', compression='gzip',names=features ,sep=',')
+    test.drop_duplicates(inplace=True)
 
     if(classification == 'Binary'):
         test.label = np.where(test.label == "normal.",1,0)

@@ -1,5 +1,7 @@
+# import sys
+# sys.path.insert(0, './KDD99/')
 import numpy as np
-np.random.seed(43)
+# np.random.seed(43)
 import pandas as pd
 import os
 from scipy import stats
@@ -27,6 +29,8 @@ import Utils
 # train ,test ,indx = get_kdd_data("multiclass")
 train ,test = get_kdd_data("Binary")
 
+train = train.sample(frac=0.2)
+
 train_label = train.label
 train = train.drop(["label"],axis=1)
 
@@ -37,7 +41,7 @@ xtest , ytest = Scaler.transform(test.drop(["label"],axis=1)), test.label.values
 
 def fit_kdd_AE(X):
     input_dim = X.shape[1]
-    latent_space_size = 10
+    latent_space_size = 12
     K.clear_session()
     input_ = Input(shape = (input_dim, ))
 
@@ -54,23 +58,23 @@ def fit_kdd_AE(X):
     decoded = Dense(input_dim,activation=None)(layer_7)
 
     autoencoder = Model(inputs=input_ , outputs=decoded)
-    # opt = optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer="adam")
+    # opt = optimizers.Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer="Adam")
     # autoencoder.summary()
 
     #create TensorBoard
     tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
 
     # Fit autoencoder
-    autoencoder.fit(X, X,epochs=10,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=1,callbacks=[tb])
+    autoencoder.fit(X, X,epochs=10,validation_split=0.2 ,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
 
     return autoencoder
 
-# model = fit_kdd_AE(train)
-# with open('kdd99_ep10_bs100_l10.pickle', 'wb') as f:
+model = fit_kdd_AE(train)
+# with open('kdd99_ep10_bs100_l12_samp20.pickle', 'wb') as f:
 #             pickle.dump(model, f)
-with open('kdd99_ep10_bs100_l10.pickle', 'rb') as fid:
-    model = pickle.load(fid)
+# with open('kdd99_ep10_bs100_l10.pickle', 'rb') as fid:
+#     model = pickle.load(fid)
 losses = Utils.get_losses(model, train)
 
 thresholds = Utils.confidence_intervals(losses,0.95)

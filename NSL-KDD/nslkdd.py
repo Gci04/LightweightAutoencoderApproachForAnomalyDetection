@@ -1,3 +1,5 @@
+import sys
+sys.path.insert(0, './NSL-KDD/')
 import numpy as np
 np.random.seed(43)
 import pandas as pd
