@@ -1,5 +1,5 @@
-# import sys
-# sys.path.insert(0, './KDD99/')
+import sys
+sys.path.insert(0, './KDD99/')
 import numpy as np
 # np.random.seed(43)
 import pandas as pd
@@ -29,7 +29,7 @@ import Utils
 # train ,test ,indx = get_kdd_data("multiclass")
 train ,test = get_kdd_data("Binary")
 
-train = train.sample(frac=0.2)
+# train = train.sample(frac=0.5,replace=False)
 
 train_label = train.label
 train = train.drop(["label"],axis=1)
@@ -66,14 +66,15 @@ def fit_kdd_AE(X):
     tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
 
     # Fit autoencoder
-    autoencoder.fit(X, X,epochs=10,validation_split=0.2 ,batch_size=100,shuffle=True,verbose=1,callbacks=[tb])
-
+    start= time()
+    autoencoder.fit(X, X,epochs=20,validation_split=0.2 ,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
+    print(time() - start)
     return autoencoder
 
 model = fit_kdd_AE(train)
-# with open('kdd99_ep10_bs100_l12_samp20.pickle', 'wb') as f:
-#             pickle.dump(model, f)
-# with open('kdd99_ep10_bs100_l10.pickle', 'rb') as fid:
+# with open('kdd99_ep20_bs100_l12_samp50.pickle', 'wb') as f:
+            # pickle.dump(model, f)
+# with open('KDD99/kdd99_ep10_bs100_l12_samp20.pickle', 'rb') as fid:
 #     model = pickle.load(fid)
 losses = Utils.get_losses(model, train)
 
