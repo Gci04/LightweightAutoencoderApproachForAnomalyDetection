@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score,f1_score,classification_report,confus
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sn
+from sklearn.manifold import TSNE
 # %matplotlib inline
 
 def mse(pred,true):
@@ -29,7 +30,7 @@ def confidence_intervals(data, confidence=0.97):
 def predictAnomaly(model,x,threshold):
     pred = model.predict(x)
     MSE = mse(pred,x)
-    res = np.where(MSE < threshold,1,0) #anomaly : 0, normal : 1
+    res = np.where(MSE < threshold,0,1) #anomaly : 1, normal : 0
     return res
 def performance(true,pred,title="confusion matrix"):
     acc = accuracy_score(pred,true)
@@ -46,4 +47,14 @@ def performance(true,pred,title="confusion matrix"):
     plt.yticks(fontsize=20)
     plt.title(title,fontsize=20)
     fig = sn.heatmap(df_cm,fmt='g',annot=True,annot_kws={"size": 20})
+    plt.show()
+def get_TSNE(dim_reducer,x,labels):
+
+    test_reduced = dim_reducer.predict(x)
+    test_embedded = TSNE(n_components=2).fit_transform(test_reduced)
+
+    # with open('test_tsne.pickle', 'wb') as f:
+    #             pickle.dump(test_embedded, f)
+
+    plt.scatter(test_embedded[:,0], test_embedded[:,1], c = labels)
     plt.show()
