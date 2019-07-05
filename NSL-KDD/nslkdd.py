@@ -39,7 +39,7 @@ xtest , ytest = Scaler.transform(test.drop(["label","weight"],axis=1)), test.lab
 
 def fit_model(params,X,latent=10,BS=250,ep = 100):
     input_dim = train.shape[1]
-    latent_space_size = 10
+    latent_space_size = latent
     K.clear_session()
     input_ = Input(shape = (input_dim, ))
 
@@ -59,11 +59,11 @@ def fit_model(params,X,latent=10,BS=250,ep = 100):
     opt = optimizers.Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
     autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer=opt)
 
-    autoencoder.fit(train, train,epochs=100,validation_split=0.2,batch_size=250,shuffle=True,verbose=0)
+    autoencoder.fit(X, X,epochs=ep,validation_split=0.2,batch_size=BS,shuffle=True,verbose=0)
 
     return autoencoder
 
-model = fit_model(["tanh","Adam"],X=train,latent=10,BS=250,ep=95)
+model = fit_model(["tanh","Adam"],X=train,latent=12,BS=250,ep=95)
 
 # with open('nslkdd_reg_ep100_bs250_final.pickle', 'wb') as f:
 #             pickle.dump(model, f)

@@ -15,6 +15,7 @@ def get_data(classification = 'Binary'):
     features.append("weight")
 
     train = pd.read_csv("NSL-KDD/NSL-KDD_Data/KDDTrain+.txt",names=features)
+    # train.drop_duplicates(inplace=True)
     test = pd.read_csv("NSL-KDD/NSL-KDD_Data/KDDTest+.txt",names=features)
 
     if(classification == 'multiclass'):
