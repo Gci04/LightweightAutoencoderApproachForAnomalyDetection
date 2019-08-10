@@ -50,7 +50,7 @@ This code is written in Python 3.6.7 using keras having tensorflow 1.x as backen
     │   └── ...
     ├── UNSW-NB15               # Implementation for UNSW-NB15 dataset
     │   ├── dataset             # UNSW-NB15 Dataset folder
-    │   ├── prerocessing.py     # Model training and testing Training log files folder
+    │   ├── prerocessing.py     # Model training and testing
     │   ├── 
     │   └── ...
     └── README.md
