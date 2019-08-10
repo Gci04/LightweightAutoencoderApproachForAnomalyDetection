@@ -62,7 +62,7 @@ def fit_kdd_AE(X):
     tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
 
     # Fit autoencoder
-    autoencoder.fit(X, X,epochs=10,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=1,callbacks=[tb])
+    autoencoder.fit(X, X,epochs=100,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=0,callbacks=[tb])
 
     return autoencoder
 

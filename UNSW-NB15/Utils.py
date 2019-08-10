@@ -30,7 +30,7 @@ def confidence_intervals(data, confidence=0.97):
 def predictAnomaly(model,x,threshold):
     pred = model.predict(x)
     MSE = mse(pred,x)
-    res = np.where(MSE < threshold,0,1) #anomaly : 1, normal : 0
+    res = np.where(MSE <= threshold,0,1) #anomaly : 1, normal : 0
     return res
 def performance(true,pred,title="confusion matrix"):
     acc = accuracy_score(pred,true)

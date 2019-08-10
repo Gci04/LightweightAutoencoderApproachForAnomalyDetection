@@ -1,5 +1,5 @@
 import sys
-sys.path.insert(0, './KDD99/')
+# sys.path.insert(0, './KDD99/')
 import os
 import pandas as pd
 import numpy as np
@@ -11,14 +11,14 @@ warnings.filterwarnings('ignore')
 
 def get_kdd_data(classification = 'Binary'):
     features = None
-    with open('KDD99/features.txt', 'r') as f:
+    with open('features.txt', 'r') as f:
       features = f.read().split('\n')
 
-    train = pd.read_csv('KDD99/KDD99_Data/kdd_train.gz', compression='gzip',names=features ,sep=',')
+    train = pd.read_csv('KDD99_Data/kdd_train.gz', compression='gzip',names=features ,sep=',')
     train.drop_duplicates(inplace=True)
 
 
-    test = pd.read_csv('KDD99/KDD99_Data/kdd_test.gz', compression='gzip',names=features ,sep=',')
+    test = pd.read_csv('KDD99_Data/kdd_test.gz', compression='gzip',names=features ,sep=',')
     test.drop_duplicates(inplace=True)
 
     train = get_sample(train)
@@ -49,7 +49,7 @@ def get_kdd_data(classification = 'Binary'):
         test = combined.iloc[nTrain:]
         test.reset_index(inplace = True,drop=True)
 
-        attack_types = pd.read_csv('KDD99/attacks_types.txt',sep=" ",header=None,index_col=0)
+        attack_types = pd.read_csv('attacks_types.txt',sep=" ",header=None,index_col=0)
         attack_map = attack_types.to_dict('dict')[1]
 
         test["label"] = test["label"].apply(lambda x: attack_map.get(x.replace(".", ""),"Unknown"))

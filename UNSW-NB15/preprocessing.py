@@ -13,9 +13,12 @@ from keras import regularizers, backend as K
 import Utils
 from sklearn.manifold import TSNE
 from matplotlib import pyplot as plt
+from collections import defaultdict
+
+import category_encoders as ce
 
 #label 0 - normal, 1 - anomal
-def get_data(classification="Binary"):
+def get_data(classification="Binary",encoding="OneHot"):
 
     test = pd.read_csv("UNSW-NB15/dataset/part_training_testing_set/UNSW_NB15_testing-set.csv")
     train = pd.read_csv("UNSW-NB15/dataset/part_training_testing_set/UNSW_NB15_testing-set.csv")
@@ -25,14 +28,19 @@ def get_data(classification="Binary"):
 
     attack_cat = test.attack_cat
 
-    combined = pd.concat((train,test),axis=0)
-    combined = pd.get_dummies(combined.drop(["attack_cat","id"],axis=1), columns=["proto","service","state"])
+    if encoding == "OneHot":
+        combined = pd.concat((train,test),axis=0)
+        combined = pd.get_dummies(combined.drop(["attack_cat"],axis=1), columns=["proto","service","state"])
 
-    train = combined.iloc[:nTrain]
-    train.reset_index(inplace = True,drop=True)
+        train = combined.iloc[:nTrain]
+        train.reset_index(inplace = True,drop=True)
 
-    test = combined.iloc[nTrain:]
-    test.reset_index(inplace = True,drop=True)
+        test = combined.iloc[nTrain:]
+        test.reset_index(inplace = True,drop=True)
+    else:
+        hash_encoder = ce.HashingEncoder(cols= ["proto","service","state"],n_components = 13)
+        train = hash_encoder.fit_transform(train.drop(["attack_cat"],axis=1),train.label)
+        test = hash_encoder.transform(test.drop(["attack_cat"],axis=1))
 
     if(classification != "Binary"):
         indices = defaultdict(dict)
