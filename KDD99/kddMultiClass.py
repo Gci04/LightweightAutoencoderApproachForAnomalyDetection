@@ -1,7 +1,7 @@
 import sys
 sys.path.insert(0, './KDD99/')
 import numpy as np
-# np.random.seed(43)
+np.random.seed(43)
 import pandas as pd
 import os
 from scipy import stats
@@ -15,9 +15,9 @@ from keras import optimizers, regularizers, backend as K
 import seaborn as sn
 import keras
 from matplotlib import pyplot as plt
-%matplotlib inline
+# %matplotlib inline
 import pickle
-
+from sklearn import metrics
 import seaborn as sn
 
 import warnings
@@ -26,9 +26,7 @@ warnings.filterwarnings('ignore')
 from preprocessing import get_kdd_data
 import Utils
 
-# train ,test ,indx = get_kdd_data("multiclass")
-train ,test = get_kdd_data("Binary")
-
+train ,test ,indx = get_kdd_data("multiclass")
 train_label = train.label
 train = train.drop(["label"],axis=1)
 
@@ -56,27 +54,38 @@ def fit_kdd_AE(X):
     decoded = Dense(input_dim,activation=None)(layer_7)
 
     autoencoder = Model(inputs=input_ , outputs=decoded)
-    # opt = optimizers.Adam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
-    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer="Adam")
+    # opt = optimizers.Adam(lr=0.001, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+    autoencoder.compile(metrics=['accuracy'],loss='mean_squared_error',optimizer="adam")
     # autoencoder.summary()
 
     #create TensorBoard
     tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
 
     # Fit autoencoder
-    start= time()
-    autoencoder.fit(X, X,epochs=20,validation_split=0.2 ,batch_size=100,shuffle=True,verbose=0,callbacks=[tb])
-    print(time() - start)
+    autoencoder.fit(X, X,epochs=100,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=0,callbacks=[tb])
+
     return autoencoder
 
 model = fit_kdd_AE(train)
-# with open('KDD99/kdd99_ep20_bs100_l12_samp50.pickle', 'wb') as f:
-            # pickle.dump(model, f)
-# with open('KDD99/kdd99_ep100_bs100_l12_samp50_final.pickle', 'rb') as fid:
-#     model = pickle.load(fid)
+
 losses = Utils.get_losses(model, train)
 thresholds = Utils.confidence_intervals(losses,0.95)
-#choose the upper interval as threshold
 threshold = thresholds[1]
 pred = Utils.predictAnomaly(model,xtest,threshold)
-Utils.performance(ytest,pred)
+true = np.where(ytest == "normal", 1,0)
+Utils.performance(pred,true)
+#1 : normal , 0 : Anomal
+for key in indx.keys():
+    if(key != "normal"):
+        print('-'*35)
+        print(' '*18 + key)
+        print('-'*35)
+        temp = np.ones(len(pred))
+        mask = indx[key]
+        np.put(temp,mask,0)
+        temp_pred = np.ones(len(pred))
+        np.put(temp_pred,mask,pred[mask])
+        res = metrics.classification_report(temp,temp_pred,output_dict=True)["0.0"]
+        print("{:<12s}{:<12s}{:<12s}".format("precision", "recall" ,"f1-score"))
+        print("{:<12.2f} {:<12.2f} {:<12.2f}".format(res["precision"],res["recall"],res["f1-score"]))
+        print()
