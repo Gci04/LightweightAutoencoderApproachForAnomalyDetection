@@ -4,7 +4,7 @@ This repository provides a Keras-Tensorflow implementation of the Intrusion dete
 
 # Citations and Contact.
 
-You find a PDF of the **A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection** at:
+You find a PDF of the **A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection** at: xxxx
 
 If you use our work, please also cite the paper:
 
