@@ -1,47 +1,41 @@
+import pandas as pd
 import numpy as np
 np.random.seed(43)
-import sys
-sys.path.insert(0, './NSL-KDD/')
+import sys, os, pickle, keras, warnings
+
+warnings.filterwarnings('ignore')
+
 from tensorflow import set_random_seed
 set_random_seed(1)
-import pandas as pd
-import os
+
 from scipy import stats
 from time import time
-from keras.layers import Input, Dense,Dropout
+
+from keras.layers import Input, Dense
 from keras.models import Model
-from keras.callbacks import TensorBoard
 import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
 from keras import optimizers, regularizers, backend as K
-import seaborn as sn
-import keras
+
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import StandardScaler
 from matplotlib import pyplot as plt
-%matplotlib inline
-import pickle
-from sklearn.metrics import accuracy_score,f1_score,classification_report
-
 import seaborn as sn
-
-import warnings
-warnings.filterwarnings('ignore')
+# %matplotlib inline
 
 from preprocessing import get_data
 import Utils
 
-import warnings
-warnings.filterwarnings('ignore')
 
 #for NLS-KDD
 train ,test ,indexes = get_data("multiclass")
 
 train_label = train.label
-train = train.drop(["label","weight"],axis=1)
+train = train.drop(["label"],axis=1)
 
 Scaler = StandardScaler()
 train = Scaler.fit_transform(train.values)[np.where(train_label == 1)]
 
-xtest , ytest = Scaler.transform(test.drop(["label","weight"],axis=1)), test.label.values
+xtest , ytest = Scaler.transform(test.drop(["label"],axis=1)), test.label.values
 
 def fit_model(params,X,latent=10,BS=250,ep = 95):
 
@@ -71,9 +65,14 @@ def fit_model(params,X,latent=10,BS=250,ep = 95):
   return autoencoder
 
 # model = fit_model(["tanh","Adam"],X=train,latent=10,BS=250,ep=95)
+if os.path.exists('models/model_tanh_Adam_reg_ep95_bs250.pickle'):
+    with open('models/model_tanh_Adam_reg_ep95_bs250.pickle', 'rb') as fid:
+        model = pickle.load(fid)
 
-with open('NSL-KDD/model_tanh_Adam_reg_ep95_bs250.pickle', 'rb') as fid:
-    model = pickle.load(fid)
+else:
+    model = fit_model(["tanh","Adam"],X=train,latent=12,BS=250,ep=95)
+    with open('models/model_tanh_Adam_reg_ep95_bs250.pickle', 'wb') as f:
+                pickle.dump(model, f)
 
 losses = Utils.get_losses(model, train)
 thresholds = Utils.confidence_intervals(losses,0.95)

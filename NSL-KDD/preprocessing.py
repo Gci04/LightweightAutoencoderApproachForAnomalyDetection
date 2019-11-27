@@ -8,15 +8,10 @@ from collections import defaultdict
 import warnings
 warnings.filterwarnings('ignore')
 
-def get_data(classification = 'Binary'):
-    features = None
-    with open('NSL-KDD/features.txt', 'r') as f:
-      features = f.read().split('\n')
-    features.append("weight")
+def get_data(classification = 'Binary',data_folder="Data"):
 
-    train = pd.read_csv("NSL-KDD/NSL-KDD_Data/KDDTrain+.txt",names=features)
-    # train.drop_duplicates(inplace=True)
-    test = pd.read_csv("NSL-KDD/NSL-KDD_Data/KDDTest+.txt",names=features)
+    train = pd.read_csv(data_folder+"/KDDTrain.csv")
+    test = pd.read_csv(data_folder+"/KDDTest.csv")
 
     if(classification == 'multiclass'):
 
@@ -30,11 +25,6 @@ def get_data(classification = 'Binary'):
 
         test = combined.iloc[nTrain:]
         test.reset_index(inplace = True,drop=True)
-
-        train_att = pd.read_csv('NSL-KDD/attacks_types.txt',sep=" ",header=None,index_col=0)
-        attack_map = train_att.to_dict('dict')[1]
-
-        test["label"] = test["label"].apply(lambda x: attack_map.get(x,"Unknown"))
 
         indexes = defaultdict(dict)
         for label in np.unique(test.label):

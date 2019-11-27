@@ -4,7 +4,7 @@ from sklearn.metrics import accuracy_score,f1_score,classification_report,confus
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sn
-# %matplotlib inline
+
 
 def mse(pred,true):
     result = []
@@ -19,6 +19,7 @@ def get_losses(model, x):
     pred = model.predict(x)
     err = mse(x, pred)
     return err
+
 def confidence_intervals(data, confidence=0.97):
     n = len(data)
     # mean & standard deviation
@@ -26,11 +27,13 @@ def confidence_intervals(data, confidence=0.97):
     z_critical = stats.norm.ppf(q = confidence)
     margin_of_error = z_critical * (std_dev/np.sqrt(n))
     return [mean-margin_of_error, mean+margin_of_error]
+
 def predictAnomaly(model,x,threshold):
     pred = model.predict(x)
     MSE = mse(pred,x)
     res = np.where(MSE < threshold,1,0) #anomaly : 0, normal : 1
     return res
+
 def performance(true,pred,title="confusion matrix"):
     acc = accuracy_score(pred,true)
     print("Accurary : ",acc)
