@@ -1,27 +1,22 @@
-import sys
-sys.path.insert(0, './KDD99/')
 import numpy as np
-np.random.seed(43)
 import pandas as pd
-import os
+np.random.seed(43)
+
+import os, sys, keras, pickle, warnings
 from scipy import stats
 from time import time
-from keras.layers import Input, Dense,Dropout
+
+import tensorflow as tf
+from keras.layers import Input, Dense, Dropout
 from keras.models import Model
 from keras.callbacks import TensorBoard
-import tensorflow as tf
-from sklearn.preprocessing import StandardScaler
 from keras import optimizers, regularizers, backend as K
-import seaborn as sn
-import keras
-from matplotlib import pyplot as plt
-# %matplotlib inline
-import pickle
-from sklearn import metrics
-import seaborn as sn
 
-import warnings
 warnings.filterwarnings('ignore')
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import classification_report
+import seaborn as sn
+from matplotlib import pyplot as plt
 
 from preprocessing import get_kdd_data
 import Utils
@@ -59,7 +54,7 @@ def fit_kdd_AE(X):
     # autoencoder.summary()
 
     #create TensorBoard
-    tb = TensorBoard(log_dir="./kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
+    tb = TensorBoard(log_dir="kdd99logs/{}".format(time()),histogram_freq=0,write_graph=True,write_images=False)
 
     # Fit autoencoder
     autoencoder.fit(X, X,epochs=100,validation_split=0.1 ,batch_size=100,shuffle=False,verbose=0,callbacks=[tb])
@@ -85,7 +80,7 @@ for key in indx.keys():
         np.put(temp,mask,0)
         temp_pred = np.ones(len(pred))
         np.put(temp_pred,mask,pred[mask])
-        res = metrics.classification_report(temp,temp_pred,output_dict=True)["0.0"]
+        res = classification_report(temp,temp_pred,output_dict=True)["0.0"]
         print("{:<12s}{:<12s}{:<12s}".format("precision", "recall" ,"f1-score"))
         print("{:<12.2f} {:<12.2f} {:<12.2f}".format(res["precision"],res["recall"],res["f1-score"]))
         print()
