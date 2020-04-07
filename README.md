@@ -4,23 +4,20 @@ This repository provides a Keras-Tensorflow implementation of the Intrusion dete
 
 # Citations and Contact.
 
-You find a PDF of the **A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection** at: xxxx
+You find a PDF format here : [**A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection**](https://ieeexplore.ieee.org/document/9035217)
 
 If you use our work, please also cite the paper:
 
 ```
-@article{xxxx,
-  title={A Lightweight Deep Autoencoder-based Approach for Unsupervised Anomaly Detection},
-  author={Gcinizwe Dlamini, Rufina Galieva and Muhammad Fahim},
-  journal={xxxx},
-  year={xxxx}
+@INPROCEEDINGS{9035217,  
+  author={G. {Dlamini} and R. {Galieva} and M. {Fahim}},  
+  booktitle={2019 IEEE/ACS 16th International Conference on Computer Systems and Applications (AICCSA)},  
+  title={A Lightweight Deep Autoencoder-Based Approach for Unsupervised Anomaly Detection},   
+  year={2019},  
+  pages={1-5}
 }
+
 ```
-
-If you would like to get in touch, please contact .
-m.fahim@innopolis.ru,
-r.galieva@innopolis.university or g.dlamini@innopolis.university
-
 
 
 # Abstract
@@ -51,9 +48,10 @@ This code is written in Python 3.6.7 using keras having tensorflow 1.x as backen
     ├── UNSW-NB15               # Implementation for UNSW-NB15 dataset
     │   ├── dataset             # UNSW-NB15 Dataset folder
     │   ├── prerocessing.py     # Model training and testing
-    │   ├── 
     │   └── ...
+    ├── requirements.txt  
     └── README.md
+
 
 
 # Contributing

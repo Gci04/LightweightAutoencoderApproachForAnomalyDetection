@@ -1,0 +1,6 @@
+Category,Attack Types
+normal,normal
+dos,"back, land, neptune, pod, smurf, teardrop, mailbomb, apache2, processtable, udpstorm"
+probe,"ipsweep, nmap, portsweep, satan, mscan, saint"
+r2l,"ftp_write, guess_passwd, imap, multihop, phf, spy, warezclient, warezmaster, sendmail, named, snmpgetattack, snmpguess, xlock, xsnoop, worm"
+u2r,"buffer_overflow, loadmodule, perl, rootkit, httptunnel, ps, sqlattack, xterm"
